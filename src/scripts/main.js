@@ -29,6 +29,61 @@ btnStart.addEventListener('click', () => {
   render();
 });
 
+let touchStartX = 0;
+let touchStartY = 0;
+
+document.addEventListener(
+  'touchstart',
+  (e) => {
+    // Запоминаем начальную точку касания
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+  },
+  { passive: true },
+);
+
+document.addEventListener(
+  'touchend',
+  (e) => {
+    // Запоминаем точку, где палец оторвался от экрана
+    const touchEndX = e.changedTouches[0].screenX;
+    const touchEndY = e.changedTouches[0].screenY;
+
+    handleSwipe(touchStartX, touchStartY, touchEndX, touchEndY);
+  },
+  { passive: true },
+);
+
+function handleSwipe(startX, startY, endX, endY) {
+  const diffX = endX - startX;
+  const diffY = endY - startY;
+
+  // Минимальное расстояние в пикселях, которое считается за свайп
+  const threshold = 30;
+
+  if (Math.abs(diffX) > Math.abs(diffY)) {
+    // Горизонтальный свайп
+    if (Math.abs(diffX) > threshold) {
+      if (diffX > 0) {
+        game.moveRight();
+      } else {
+        game.moveLeft();
+      }
+      render();
+    }
+  } else {
+    // Вертикальный свайп
+    if (Math.abs(diffY) > threshold) {
+      if (diffY > 0) {
+        game.moveDown();
+      } else {
+        game.moveUp();
+      }
+      render();
+    }
+  }
+}
+
 document.addEventListener('keydown', (e) => {
   btnStart.classList.remove('start');
   btnStart.classList.add('restart');
